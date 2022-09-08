@@ -13,12 +13,17 @@ my_socket.listen(20)
 conn, addr = my_socket.accept()
 print("Connection established", conn, addr)
 
-data = conn.recv(1024)
-print("Data accept:\n", data.decode("UTF-8"))
+data = conn.recv(10000)
+data_2 = (data.decode('utf-8')).split("\r\n")
+headers = []
+for i in data_2:
+    headers.append(i)
+data_3 = str('<br>'.join(headers)).encode()
 
-conn.send(b"HTTP/1.0 200 OK\n")
-conn.send(b'Content-Type: text/html\n')
-conn.send(b'\n')
-conn.send(b'<html><body><h1>{:((f(}</body></html>')
+
+conn.send(b"HTTP/1.0 200 OK\r\nContent-Length: 100\r\nConnection: close\r\nContent-Type: text/html\r\n\r\n")
+conn.send(b"<body>")
+conn.send(data_3)
+conn.send(b"</body>")
 
 my_socket.close()
